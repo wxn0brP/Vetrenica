@@ -1,8 +1,7 @@
 {
     "name": "atc",
     "version": "0.0.1",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "src/index.ts",
     "description": "",
     "repository": {
         "type": "git",
@@ -14,13 +13,12 @@
     "type": "module",
     "scripts": {
         "build": "bun build src/public/index.ts --bundle --outdir=dist/public --sourcemap --external '/gloves-link/client.js'",
-        "bun": "suglite -f suglite.bun.json",
-        "ts": "suglite -f suglite.ts.json",
-        "split": "suglite -f suglite.split.json"
+        "bun": "suglite -f suglite/bun.json",
+        "ts": "suglite -f suglite/ts.json",
+        "split": "suglite -f suglite/split.json"
     },
     "devDependencies": {
-        "@types/node": "*",
-        "tsc-alias": "*",
+        "@types/bun": "*",
         "typescript": "*"
     },
     "dependencies": {
