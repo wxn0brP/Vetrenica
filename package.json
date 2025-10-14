@@ -1,0 +1,31 @@
+{
+    "name": "atc",
+    "version": "0.0.1",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "description": "",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/wxn0brP/atc.git"
+    },
+    "homepage": "https://github.com/wxn0brP/atc",
+    "author": "wxn0brP",
+    "license": "MIT",
+    "type": "module",
+    "scripts": {
+        "build": "bun build src/public/index.ts --bundle --outdir=dist/public --sourcemap --external '/gloves-link/client.js'",
+        "bun": "suglite -f suglite.bun.json",
+        "ts": "suglite -f suglite.ts.json",
+        "split": "suglite -f suglite.split.json"
+    },
+    "devDependencies": {
+        "@types/node": "*",
+        "tsc-alias": "*",
+        "typescript": "*"
+    },
+    "dependencies": {
+        "@wxn0brp/falcon-frame": "^0.5.0",
+        "@wxn0brp/gloves-link-client": "github:wxn0brP/GlovesLink#dist-client",
+        "@wxn0brp/gloves-link-server": "github:wxn0brP/GlovesLink#dist-server"
+    }
+}

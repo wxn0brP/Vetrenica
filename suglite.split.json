@@ -1,0 +1,7 @@
+{
+    "ref": "ref.json",
+    "cmd": "python3 py/split.py",
+    "watch": [
+        "py/split.py"
+    ]
+}
