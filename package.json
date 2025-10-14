@@ -1,13 +1,13 @@
 {
-    "name": "atc",
+    "name": "vetrenica",
     "version": "0.0.1",
     "main": "src/index.ts",
     "description": "",
     "repository": {
         "type": "git",
-        "url": "https://github.com/wxn0brP/atc.git"
+        "url": "https://github.com/wxn0brP/Vetrenica.git"
     },
-    "homepage": "https://github.com/wxn0brP/atc",
+    "homepage": "https://github.com/wxn0brP/Vetrenica",
     "author": "wxn0brP",
     "license": "MIT",
     "type": "module",

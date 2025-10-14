@@ -1,4 +1,4 @@
-# MA (Audio Transcription and Monitoring)
+# Vetrenica
 
 This project monitors live ATC (Air Traffic Control) radio feeds, transcribes the audio in real-time using Whisper AI, and provides an API for processing audio segments.
 
