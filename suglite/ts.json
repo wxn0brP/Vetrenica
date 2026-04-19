@@ -1,5 +1,4 @@
 {
-    "ref": "suglite/ref.json",
     "cmd": "python3 py/ts.py",
     "watch": [
         "py/ts.py"

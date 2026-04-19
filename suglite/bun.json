@@ -1,5 +1,4 @@
 {
-    "ref": "suglite/ref.json",
     "cmd": "bun run src/index.ts",
     "watch": [
         "src"

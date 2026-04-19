@@ -17,15 +17,14 @@ app.get("/new", (req, res) => {
 
 const server = app.listen(55524, true);
 
-const wws = new GlovesLinkServer({
-    server
-});
+const wws = new GlovesLinkServer({});
 wws.falconFrame(app);
+wws.attachToHttpServer(server);
 
-wws.onConnect(socket => {
+wws.of("/").onConnect(socket => {
     console.log("Client connected");
 });
 
 export function sendToClients(data: TranscriptRes) {
-    wws.broadcast("data", data);
+    wws.of("/").emit("data", data);
 }

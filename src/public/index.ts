@@ -1,16 +1,14 @@
 const transcriptsContainer = document.querySelector("#transcripts");
-import type GlovesLinkClient from "@wxn0brp/gloves-link-client";
-// @ts-ignore
-import { GLC } from "/gloves-link/client.js";
+import { GLC } from "@wxn0brp/gloves-link-client";
 import { TranscriptRes } from "../shared/types";
 
-const socket: GlovesLinkClient = new GLC();
+const socket = new GLC("/");
 
 socket.on("connect", () => {
     console.log("Connected to server");
 });
 
-socket.on("data", (data) => {
+socket.on("data", (data: any) => {
     console.log(data);
     displayTranscript(data);
 });
