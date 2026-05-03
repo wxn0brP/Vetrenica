@@ -9,3 +9,8 @@ export interface TranscriptRes {
     segments: Transcript[];
     status: string;
 }
+
+export interface Aircraft {
+    callSign: string;
+    country: string;
+}

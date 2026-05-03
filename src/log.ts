@@ -1,7 +1,7 @@
 import { TranscriptRes } from "./shared/types";
 
 export function prettyPrintTranscript(res: TranscriptRes): void {
-    const line = '─'.repeat(60);
+    const line = '-'.repeat(60);
     console.log(`\n${line}`);
     console.log(`📁  ${res.filename}`);
     console.log(`🧾  status: ${res.status}`);

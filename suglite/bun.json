@@ -2,5 +2,8 @@
     "cmd": "bun run src/index.ts",
     "watch": [
         "src"
+    ],
+    "ignore": [
+        "src/public"
     ]
 }

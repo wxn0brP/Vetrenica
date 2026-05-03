@@ -1,22 +1,30 @@
-from faster_whisper import WhisperModel
+import torch
+from transformers import WhisperProcessor, WhisperForConditionalGeneration
 from flask import Flask, request, jsonify
 import os
 import logging
 from typing import List, Dict, Any
+import librosa
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-SEGMENTS_DIR = "segments"
+SEGMENTS_DIR = "/tmp/vetrenica/segments"
 
 try:
-    logger.info("Loading Whisper model...")
-    model = WhisperModel("medium", compute_type="float32")
+    logger.info("Loading WhisperATC model...")
+    processor = WhisperProcessor.from_pretrained("jlvdoorn/whisper-large-v3-atco2-asr")
+    model = WhisperForConditionalGeneration.from_pretrained("jlvdoorn/whisper-large-v3-atco2-asr", torch_dtype=torch.float32)
+    model.eval()
+    if torch.cuda.is_available():
+        model = model.cuda()
     logger.info("Model loaded successfully")
 except Exception as e:
+    logger.error(f"-------------------")
     logger.error(f"Failed to load model: {e}")
-    model = None
+    logger.error(f"-------------------")
+    exit(1)
 
 def validate_filename(filename: str) -> str:
     """
@@ -46,15 +54,25 @@ def transcribe_audio(filename: str) -> List[Dict[str, Any]]:
     logger.info(f"Transcribing file: {filename}")
     
     try:
-        segments, info = model.transcribe(filename, beam_size=5)
+        audio, sample_rate = librosa.load(filename, sr=16000)
         
-        result = []
-        for segment in segments:
-            result.append({
-                "start": round(segment.start, 2),
-                "end": round(segment.end, 2),
-                "text": segment.text.strip()
-            })
+        input_features = processor(audio, sampling_rate=16000, return_tensors="pt").input_features
+        
+        if torch.cuda.is_available():
+            input_features = input_features.cuda()
+        
+        forced_decoder_ids = processor.get_decoder_prompt_ids(language="en", task="transcribe")
+        
+        with torch.no_grad():
+            predicted_ids = model.generate(input_features, forced_decoder_ids=forced_decoder_ids, max_new_tokens=256)
+        
+        transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)[0]
+        
+        result = [{
+            "start": 0.0,
+            "end": round(librosa.get_duration(y=audio, sr=16000), 2),
+            "text": transcription.strip()
+        }]
         
         return result
         
@@ -66,8 +84,11 @@ def transcribe_audio(filename: str) -> List[Dict[str, Any]]:
 def transcribe_endpoint():
     """
     Endpoint for audio transcription
-    GET /?id=filename (bez ścieżki i rozszerzenia)
+    GET /?id=filename
     """
+    print()
+    print()
+
     if model is None:
         return jsonify({"error": "Model not loaded"}), 500
     
@@ -115,3 +136,6 @@ if __name__ == '__main__':
     logger.info("Starting HTTP server on port 55523...")
     logger.info(f"Serving files from: {os.path.abspath(SEGMENTS_DIR)}")
     app.run(host='0.0.0.0', port=55523, debug=False)
+    print()
+    print()
+    

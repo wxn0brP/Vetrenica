@@ -1,29 +1,29 @@
 {
-	"name": "vetrenica",
-	"version": "0.0.1",
-	"main": "src/index.ts",
-	"description": "",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/wxn0brP/Vetrenica.git"
-	},
-	"homepage": "https://github.com/wxn0brP/Vetrenica",
-	"author": "wxn0brP",
-	"license": "MIT",
-	"type": "module",
-	"scripts": {
-		"build": "bun build src/public/index.ts --outdir=dist/public --sourcemap --bundle",
-		"bun": "suglite -f suglite/bun.json",
-		"ts": "suglite -f suglite/ts.json",
-		"split": "suglite -f suglite/split.json"
-	},
-	"devDependencies": {
-		"@types/bun": "*",
-		"typescript": "^6"
-	},
-	"dependencies": {
-		"@wxn0brp/falcon-frame": "^0.8.1",
-		"@wxn0brp/gloves-link-client": "^0.1.1",
-		"@wxn0brp/gloves-link-server": "^0.1.1"
-	}
+    "name": "vetrenica",
+    "version": "0.0.1",
+    "main": "src/index.ts",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/wxn0brP/Vetrenica.git"
+    },
+    "homepage": "https://github.com/wxn0brP/Vetrenica",
+    "author": "wxn0brP",
+    "license": "MIT",
+    "type": "module",
+    "scripts": {
+        "build": "bun build src/public/index.ts --outdir=dist/public --sourcemap --bundle",
+        "bun": "suglite -f suglite/bun.json",
+        "ts": "suglite -f suglite/ts.json",
+        "build:watch": "suglite -f suglite/build.json",
+        "split": "suglite -f suglite/split.json"
+    },
+    "devDependencies": {
+        "@types/bun": "*",
+        "typescript": "^6"
+    },
+    "dependencies": {
+        "@wxn0brp/falcon-frame": "^0.8.2",
+        "@wxn0brp/gloves-link-client": "^0.1.1",
+        "@wxn0brp/gloves-link-server": "^0.1.1"
+    }
 }

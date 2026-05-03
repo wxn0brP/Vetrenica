@@ -8,8 +8,9 @@ import sys
 import requests
 import threading
 
-if not os.path.exists("segments"):
-    os.mkdir("segments")
+output_dir = "/tmp/vetrenica/segments"
+if not os.path.exists(output_dir):
+    subprocess.run(["mkdir", "-p", output_dir])
 
 def _fire_and_forget(url: str) -> None:
     """Performs a GET request and ignores any errors."""
@@ -24,6 +25,8 @@ def notify(filename: str, port: int = 55524) -> None:
     threading.Thread(target=_fire_and_forget, args=(url,), daemon=True).start()
 
 def main(url, before=1, after=2.0):
+    global output_dir
+    
     # Audio parameters
     sample_rate = 8000  # 8 kHz, typical for LiveATC
     frame_duration_ms = 30  # ms, supported by webrtcvad: 10,20,30
@@ -44,10 +47,6 @@ def main(url, before=1, after=2.0):
     recording = []
     silence_count = 0
     is_recording = False
-
-    # Counter for segments read from segments
-    output_dir = "segments"
-    os.makedirs(output_dir, exist_ok=True)
 
     # Start ffmpeg to stream and convert to raw PCM (s16le, 8kHz, mono)
     cmd = [
