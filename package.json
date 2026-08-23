@@ -16,7 +16,7 @@
     "devDependencies": {
         "@types/bun": "*",
         "@wxn0brp/biome": "*",
-        "typescript": "^6"
+        "typescript": "^7.0.0"
     },
     "dependencies": {
         "@wxn0brp/falcon-frame": "^0.8.2",
