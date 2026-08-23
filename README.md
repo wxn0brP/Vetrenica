@@ -11,12 +11,30 @@ This project monitors live ATC (Air Traffic Control) radio feeds from **Warsaw C
 - Web interface for real-time interaction
 - SSE (Server-Sent Events) for live updates
 
+## Setup
+
+Requires Python 3.12+ and ffmpeg.
+
+```bash
+./setup.sh
+```
+
+The script creates a `.venv`, installs Python dependencies from `requirements.txt`, and verifies ffmpeg availability. Then run:
+
+```bash
+# terminal 1: API server
+bun run src/index.ts
+
+# terminal 2: live transcription pipeline
+.venv/bin/python py/live.py
+```
+
 ## How It Works
 
 The project consists of three main components:
 
-1. **Live Monitoring (Python)**: The `split.py` script streams live ATC audio from LiveATC.net for EPWA, detects voice activity using WebRTC VAD, and saves audio segments to the `segments/` directory.
-2. **Segment Processing API (Bun + Python)**: A web API for processing pre-recorded audio segments.
+1. **Live Transcription (Python)**: The `live.py` script streams live ATC audio from LiveATC.net for EPWA, detects voice activity using WebRTC VAD, and transcribes utterances in-process using the Whisper ATC model. Finished transcriptions are sent to the Bun API.
+2. **Processing API (Bun)**: A web API that receives transcriptions, identifies the aircraft, and pushes updates to connected clients.
 3. **Aircraft Identification**: Uses OpenSky Network API to fetch nearby aircraft and Ollama LLM to match the speaker with the aircraft call sign.
 
 ### Data Sources
@@ -36,47 +54,19 @@ The main API server built with FalconFrame.
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/` | GET | Serves the main web interface |
-| `/new` | GET | Processes a new audio segment |
+| `/process` | POST | Processes a new transcription (JSON body) |
+| `/process` | GET | Processes a new transcription (query param, for quick tests) |
 | `/live` | WebSocket | SSE endpoint for real-time transcription updates |
 
-#### `/new` Parameters
+#### `/process` Parameters
 
-- `id` (required): Filename of the WAV file (without extension) in the `segments/` directory
-- Example: `GET /new?id=1234`
+- `text` (required): The transcription text to process
+- Example: `POST /process` with body `{"text": "LOT one two three, runway two four"}`
 
 #### WebSocket `/`
 
 Connects via WebSocket to receive real-time transcription updates. Events include:
-- `data`: Transcription result with segments
-
-### Python Transcription API (Port 55523)
-
-Flask-based server for audio transcription using Faster Whisper.
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Transcribes an audio file |
-
-#### `/` Parameters
-
-- `id` (required): Filename of the WAV file (without extension) in the `segments/` directory
-- Example: `GET /?id=1234`
-
-#### Response Format
-
-```json
-{
-  "status": "success",
-  "filename": "1234",
-  "segments": [
-    {
-      "start": 0.0,
-      "end": 5.5,
-      "text": "Transcribed text here"
-    }
-  ]
-}
-```
+- `data`: Transcription result with segments and identified speaker
 
 ## Architecture
 
@@ -89,42 +79,32 @@ Flask-based server for audio transcription using Faster Whisper.
          |
         \ /
 |-----------------|
-|   split.py      |  (Voice Activity Detection)
-|  Python Script  |
+|   live.py       |  (VAD + Whisper transcription,
+|  Python Script  |   single worker queue)
 |--------|--------|
-         | saves WAV to /tmp/vetrenica/segments/
-         |
+         | POST /process {"text": "..."}
         \ /
-|-----------------|
-|   Bun API       |  (Port 55524)
-|  /new endpoint  |
-|--------|--------|
+|-------------------|
+|   Bun API         |  (Port 55524)
+| /process endpoint |
+|--------|----------|
          |
     |-------------|
     |             |
    \ /           \ /
-|--------| |--------------|
-| Python | | OpenSky API  |
-| Flask  | | Aircraft     |
-| Whisper| | Positions    |
-|--------| |--------------|
+|-----------| |--------------|
+| OpenSky   | | Ollama       |
+| Aircraft  | | Speaker ID   |
+| Positions | | (LLM)        |
+|-----------| |--------------|
     |              |
     |------|-------|
            |
           \ /
-    |--------------|
-    |   Ollama     |
-    |  (LLM)       |
-    |--------------|
-           |
-     |-------------|
-     |             |
-    \ /           \ /
-|-----------| |---------|
-| Frontend  | | Open    |
-| WebSocket | | Flight  |
-|           | | Radar   |
-|-----------| |---------|
+    |-----------------------|
+    | WebSocket clients     |
+    | (transcript + speaker)|
+    |-----------------------|
 ```
 
 ## License

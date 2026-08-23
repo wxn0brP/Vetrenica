@@ -1,0 +1,8 @@
+[
+    {
+        cmd: "bun run build",
+        watch: [
+            "src/public"
+        ]
+    }
+]

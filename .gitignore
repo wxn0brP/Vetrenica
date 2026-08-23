@@ -8,3 +8,5 @@ bun.lock
 pls
 segments
 .env
+__pycache__
+.venv

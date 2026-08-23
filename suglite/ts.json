@@ -1,6 +1,0 @@
-{
-    "cmd": "python3 py/ts.py",
-    "watch": [
-        "py/ts.py"
-    ]
-}
